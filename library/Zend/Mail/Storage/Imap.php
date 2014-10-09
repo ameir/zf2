@@ -163,6 +163,25 @@ class Imap extends AbstractStorage implements Folder\FolderInterface, Writable\W
         return $this->protocol->fetch('RFC822.TEXT', $id);
     }
 
+    /*
+     * Get raw message
+     *
+     * @param  int               $id   number of message
+     * @param  null|array|string $part path to part or null for message content
+     * @return string raw content
+     * @throws \Zend\Mail\Protocol\Exception\RuntimeException
+     * @throws Exception\RuntimeException
+     */
+    public function getRawMessage($id, $part = null)
+    {
+        if ($part !== null) {
+            // TODO: implement
+            throw new Exception\RuntimeException('not implemented');
+        }
+
+        return $this->protocol->fetch('RFC822', $id);
+    }
+
     /**
      * create instance with parameters
      * Supported parameters are
