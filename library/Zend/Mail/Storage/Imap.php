@@ -30,6 +30,12 @@ class Imap extends AbstractStorage implements Folder\FolderInterface, Writable\W
     protected $currentFolder = '';
 
     /**
+     * IMAP folder delimiter character
+     * @var string
+     */
+    public $delimiter;
+
+    /**
      * IMAP flags to constants translation
      * @var array
      */
@@ -330,6 +336,7 @@ class Imap extends AbstractStorage implements Folder\FolderInterface, Writable\W
                     $parentFolder->$localName = $folder;
                     array_push($folderStack, $parentFolder);
                     $parentFolder = $folder;
+                    $this->delimiter = $data['delim'];
                     break;
                 } elseif ($stack) {
                     $parent = array_pop($stack);
@@ -514,5 +521,18 @@ class Imap extends AbstractStorage implements Folder\FolderInterface, Writable\W
     public function banner()
     {
         return $this->protocol->banner;
+    }
+
+    /**
+     * get IMAP delimiter
+     *
+     * @return string|null
+     */
+    public function delimiter()
+    {
+        if (!isset($this->delimiter)) {
+            $this->getFolders();
+        }
+        return $this->delimiter;
     }
 }
