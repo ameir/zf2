@@ -795,6 +795,20 @@ class Imap
     }
 
     /**
+     * get server ID
+     *
+     * @return false|string with server ID
+     */
+    public function serverId()
+    {
+        $response = $this->requestAndResponse('ID', array('NIL'), true);
+        if (!$response) {
+            return false;
+        }
+        return $response[0];
+    }
+
+    /**
      * do a search request
      *
      * This method is currently marked as internal as the API might change and is not
