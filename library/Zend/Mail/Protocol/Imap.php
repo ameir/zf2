@@ -31,6 +31,12 @@ class Imap
     protected $tagCount = 0;
 
     /**
+     * IMAP banner
+     * @var string|null
+     */
+    public $banner = null;
+
+    /**
      * Public constructor
      *
      * @param  string   $host  hostname or IP address of IMAP server, if given connect() is called
@@ -135,6 +141,9 @@ class Imap
     protected function _assumedNextLine($start)
     {
         $line = $this->_nextLine();
+        if ($this->banner == null) {
+            $this->banner = $line;
+        }
         return strpos($line, $start) === 0;
     }
 
