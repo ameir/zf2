@@ -505,4 +505,14 @@ class Imap extends AbstractStorage implements Folder\FolderInterface, Writable\W
             throw new Exception\RuntimeException('cannot set flags, have you tried to set the recent flag or special chars?');
         }
     }
+
+    /**
+     * get IMAP banner
+     *
+     * @return string|null
+     */    
+    public function banner()
+    {
+        return $this->protocol->banner;
+    }
 }
