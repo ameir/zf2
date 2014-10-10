@@ -388,6 +388,23 @@ class Imap extends AbstractStorage implements Folder\FolderInterface, Writable\W
         }
     }
 
+    /**
+     * examine given folder
+     *
+     * folder must be selectable!
+     *
+     * @param  \Zend\Mail\Storage\Folder|string $globalName global name of folder or instance for subfolder
+     * @throws Exception\RuntimeException
+     * @throws \Zend\Mail\Protocol\Exception\RuntimeException
+     */
+    public function examineFolder($globalName)
+    {
+        $this->_currentFolder = $globalName;
+        if (!$this->_protocol->examine($this->_currentFolder)) {
+            $this->_currentFolder = '';
+            throw new Exception\RuntimeException('cannot change folder, maybe it does not exist');
+        }
+    }
 
     /**
      * get \Zend\Mail\Storage\Folder instance for current folder
