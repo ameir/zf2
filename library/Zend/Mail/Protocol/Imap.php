@@ -541,7 +541,7 @@ class Imap
      *                      if one items of messages are fetched it's returned as (msgno => value)
      *                      if items of messages are fetched it's returned as (msgno => (name => value))
      */
-    public function fetch($items, $from, $to = null)
+    public function fetch($items, $from, $to = null, $uid = false)
     {
         if (is_array($from)) {
             $set = implode(',', $from);
@@ -557,7 +557,7 @@ class Imap
         $itemList = $this->escapeList($items);
 
         $tag = null;  // define $tag variable before first use
-        $this->sendRequest('FETCH', array($set, $itemList), $tag);
+        $this->sendRequest(($uid ? 'UID ' : '') . 'FETCH', array($set, $itemList), $tag);
 
         $result = array();
         $tokens = null; // define $tokens variable before first use
