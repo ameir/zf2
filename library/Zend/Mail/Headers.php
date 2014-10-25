@@ -62,7 +62,7 @@ class Headers implements Countable, Iterator
      * @throws Exception\RuntimeException
      * @return Headers
      */
-    public static function fromString($string, $EOL = self::EOL)
+    public static function fromString($string, $EOL = self::EOL, $stopOnError = true)
     {
         $headers     = new static();
         $currentLine = '';
@@ -84,10 +84,13 @@ class Headers implements Countable, Iterator
                 break;
             } else {
                 // Line does not match header format!
-                throw new Exception\RuntimeException(sprintf(
-                    'Line "%s"does not match header format!',
-                    $line
-                ));
+                $errorMsg = sprintf('Line "%s" does not match header format!' . PHP_EOL, $line);
+                if ($stopOnError) {
+                    throw new Exception\RuntimeException($errorMsg);
+                } else {
+                    echo $errorMsg;
+                    continue;
+                }
             }
         }
         if ($currentLine) {
