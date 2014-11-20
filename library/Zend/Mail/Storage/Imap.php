@@ -482,10 +482,11 @@ class Imap extends AbstractStorage implements Folder\FolderInterface, Writable\W
      * @param  string                                $message message as string or instance of message class
      * @param  null|string|\Zend\Mail\Storage\Folder $folder  folder for new message, else current folder is taken
      * @param  null|array                            $flags   set flags for new message, else a default set is used
+     * @param  null|string                           $date    set date for new message in the form of "d-M-Y H:i:s O", else current time is used
      * @throws Exception\RuntimeException
      */
      // not yet * @param string|\Zend\Mail\Message|\Zend\Mime\Message $message message as string or instance of message class
-    public function appendMessage($message, $folder = null, $flags = null)
+    public function appendMessage($message, $folder = null, $flags = null, $date = null)
     {
         if ($folder === null) {
             $folder = $this->currentFolder;
@@ -496,7 +497,7 @@ class Imap extends AbstractStorage implements Folder\FolderInterface, Writable\W
         }
 
         // TODO: handle class instances for $message
-        if (!$this->protocol->append($folder, $message, $flags)) {
+        if (!$this->protocol->append($folder, $message, $flags, $date)) {
             throw new Exception\RuntimeException('cannot create message, please check if the folder exists and your flags');
         }
     }
