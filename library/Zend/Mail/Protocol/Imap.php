@@ -535,6 +535,7 @@ class Imap
      * @param  int|array    $from  message for items or start message if $to !== null
      * @param  int|null     $to    if null only one message ($from) is fetched, else it's the
      *                             last message, INF means last message available
+     * @param  bool         $uid   set to true if passing a unique id
      * @throws Exception\RuntimeException
      * @return string|array if only one item of one message is fetched it's returned as string
      *                      if items of one message are fetched it's returned as (name => value)
@@ -646,10 +647,11 @@ class Imap
      *                             last message, INF means last message available
      * @param  string|null $mode   '+' to add flags, '-' to remove flags, everything else sets the flags as given
      * @param  bool        $silent if false the return values are the new flags for the wanted messages
+     * @param  bool        $uid    set to true if passing a unique id
      * @return bool|array new flags if $silent is false, else true or false depending on success
      * @throws \Zend\Mail\Protocol\Exception\ExceptionInterface
      */
-    public function store(array $flags, $from, $to = null, $mode = null, $silent = true)
+    public function store(array $flags, $from, $to = null, $mode = null, $silent = true, $uid = false)
     {
         $item = 'FLAGS';
         if ($mode == '+' || $mode == '-') {
@@ -665,7 +667,7 @@ class Imap
             $set .= ':' . ($to == INF ? '*' : (int) $to);
         }
 
-        $result = $this->requestAndResponse('STORE', array($set, $item, $flags), $silent);
+        $result = $this->requestAndResponse(($uid ? 'UID ' : '') . 'STORE', array($set, $item, $flags), $silent);
 
         if ($silent) {
             return $result ? true : false;

@@ -256,19 +256,21 @@ class Imap extends AbstractStorage implements Folder\FolderInterface, Writable\W
 
     /**
      * Remove a message from server. If you're doing that from a web environment
-     * you should be careful and use a uniqueid as parameter if possible to
+     * you should be careful and use a unique id as parameter if possible to
      * identify the message.
      *
-     * @param  int $id number of message
+     * @param  int  $id      number of message
+     * @param  bool $expunge set to true to expunge the message now
+     * @param  bool $uid     set to true if passing a unique id
      * @throws Exception\RuntimeException
      */
-    public function removeMessage($id)
+    public function removeMessage($id, $expunge = true, $uid = false)
     {
-        if (!$this->protocol->store(array(Mail\Storage::FLAG_DELETED), $id, null, '+')) {
+        if (!$this->protocol->store(array(Mail\Storage::FLAG_DELETED), $id, null, '+', true, $uid)) {
             throw new Exception\RuntimeException('cannot set deleted flag');
         }
         // TODO: expunge here or at close? we can handle an error here better and are more fail safe
-        if (!$this->protocol->expunge()) {
+        if ($expunge && !$this->protocol->expunge()) {
             throw new Exception\RuntimeException('message marked as deleted, but could not expunge');
         }
     }
