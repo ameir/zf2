@@ -567,8 +567,11 @@ class Imap
             if ($tokens[1] != 'FETCH') {
                 continue;
             }
+            if ($uid && $tokens[2][0] != 'UID') {
+                continue;
+            }
             // ignore other messages
-            if ($to === null && !is_array($from) && $tokens[0] != $from) {
+            if ($to === null && !is_array($from) && ($uid ? $tokens[2][1] != $from : $tokens[0] != $from)) {
                 continue;
             }
             // if we only want one item we return that one directly
@@ -595,7 +598,7 @@ class Imap
                 }
             }
             // if we want only one message we can ignore everything else and just return
-            if ($to === null && !is_array($from) && $tokens[0] == $from) {
+            if ($to === null && !is_array($from) && ($uid ? $tokens[2][1] == $from : $tokens[0] == $from)) {
                 // we still need to read all lines
                 while (!$this->readLine($tokens, $tag));
                 return $data;
