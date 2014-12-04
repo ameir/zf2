@@ -578,6 +578,8 @@ class Imap
             if (count($items) == 1) {
                 if ($tokens[2][0] == $items[0]) {
                     $data = $tokens[2][1];
+                } elseif ($uid && $tokens[2][2] == $items[0]) {
+                    $data = $tokens[2][3];
                 } else {
                     // maybe the server send an other field we didn't wanted
                     $count = count($tokens[2]);
