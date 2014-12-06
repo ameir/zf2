@@ -270,7 +270,7 @@ class Imap
      */
     public function readLine(&$tokens = array(), $wantedTag = '*', $dontParse = false)
     {
-        $tag  = null;                         // define $tag variable before first use
+        $tag = null;                         // define $tag variable before first use
         $line = $this->_nextTaggedLine($tag); // get next tag
         if (!$dontParse) {
             $tokens = $this->_decodeLine($line);
@@ -439,7 +439,6 @@ class Imap
         return $result;
     }
 
-
     /**
      * Get capabilities from IMAP server
      *
@@ -567,22 +566,26 @@ class Imap
             if ($tokens[1] != 'FETCH') {
                 continue;
             }
-            if ($uid && $tokens[2][0] != 'UID') {
-                continue;
+            // get count to reuse later
+            $count = count($tokens[2]);
+            // find array key of UID value; try the last elements, or search for it
+            if ($uid) {
+                if ($tokens[2][$count - 2] == 'UID') {
+                    $uidKey = $count - 1;
+                } else {
+                    $uidKey = array_search('UID', $tokens[2]) + 1;
+                }
             }
             // ignore other messages
-            if ($to === null && !is_array($from) && ($uid ? $tokens[2][1] != $from : $tokens[0] != $from)) {
+            if ($to === null && !is_array($from) && ($uid ? $tokens[2][$uidKey] != $from : $tokens[0] != $from)) {
                 continue;
             }
             // if we only want one item we return that one directly
             if (count($items) == 1) {
                 if ($tokens[2][0] == $items[0]) {
                     $data = $tokens[2][1];
-                } elseif ($uid && $tokens[2][2] == $items[0]) {
-                    $data = $tokens[2][3];
                 } else {
                     // maybe the server send an other field we didn't wanted
-                    $count = count($tokens[2]);
                     // we start with 2, because 0 was already checked
                     for ($i = 2; $i < $count; $i += 2) {
                         if ($tokens[2][$i] != $items[0]) {
@@ -600,7 +603,7 @@ class Imap
                 }
             }
             // if we want only one message we can ignore everything else and just return
-            if ($to === null && !is_array($from) && ($uid ? $tokens[2][1] == $from : $tokens[0] == $from)) {
+            if ($to === null && !is_array($from) && ($uid ? $tokens[2][$uidKey] == $from : $tokens[0] == $from)) {
                 // we still need to read all lines
                 while (!$this->readLine($tokens, $tag));
                 return $data;
@@ -778,7 +781,7 @@ class Imap
     {
         return $this->requestAndResponse('SUBSCRIBE', array($this->escapeString($folder)), true);
     }
-    
+
     /**
      * permanently remove messages
      *
