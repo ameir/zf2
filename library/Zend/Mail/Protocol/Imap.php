@@ -192,36 +192,38 @@ class Imap
         $line = rtrim($line) . ' ';
         while (($pos = strpos($line, ' ')) !== false) {
             $token = substr($line, 0, $pos);
-            while ($token[0] == '(') {
-                array_push($stack, $tokens);
-                $tokens = array();
-                $token = substr($token, 1);
-            }
-            if ($token[0] == '"') {
-                if (preg_match('%^\(*"((.|\\\\|\\")*?)" *%', $line, $matches)) {
-                    $tokens[] = $matches[1];
-                    $line = substr($line, strlen($matches[0]));
-                    continue;
+            if (isset($token[0])) {
+                while ($token[0] == '(') {
+                    array_push($stack, $tokens);
+                    $tokens = array();
+                    $token = substr($token, 1);
                 }
-            }
-            if ($token[0] == '{') {
-                $endPos = strpos($token, '}');
-                $chars = substr($token, 1, $endPos - 1);
-                if (is_numeric($chars)) {
-                    $token = '';
-                    while (strlen($token) < $chars) {
-                        $token .= $this->_nextLine();
+                if ($token[0] == '"') {
+                    if (preg_match('%^\(*"((.|\\\\|\\")*?)" *%', $line, $matches)) {
+                        $tokens[] = $matches[1];
+                        $line = substr($line, strlen($matches[0]));
+                        continue;
                     }
-                    $line = '';
-                    if (strlen($token) > $chars) {
-                        $line = substr($token, $chars);
-                        $token = substr($token, 0, $chars);
-                    } else {
-                        $line .= $this->_nextLine();
+                }
+                if ($token[0] == '{') {
+                    $endPos = strpos($token, '}');
+                    $chars = substr($token, 1, $endPos - 1);
+                    if (is_numeric($chars)) {
+                        $token = '';
+                        while (strlen($token) < $chars) {
+                            $token .= $this->_nextLine();
+                        }
+                        $line = '';
+                        if (strlen($token) > $chars) {
+                            $line = substr($token, $chars);
+                            $token = substr($token, 0, $chars);
+                        } else {
+                            $line .= $this->_nextLine();
+                        }
+                        $tokens[] = $token;
+                        $line = trim($line) . ' ';
+                        continue;
                     }
-                    $tokens[] = $token;
-                    $line = trim($line) . ' ';
-                    continue;
                 }
             }
             if ($stack && $token[strlen($token) - 1] == ')') {
